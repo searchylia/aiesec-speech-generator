@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIESEC Speech Topic Generator</title>
+    <style>
+        :root {
+            --primary1: #F1A1C6;
+            --primary2: #FCB318;
+            --primary3: #8E3995;
+            --sup1: #4B69B2;
+            --sup2: #740E2F;
+            --sup3: #f3e3d3;
+            --bg1: #2b1045;
+            --bg2: #4a1a5c;
+            --text: #2b1045;
+            --muted: #6b5b7a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(252, 179, 24, .35) 0%, transparent 40%),
+                radial-gradient(circle at 85% 15%, rgba(241, 161, 198, .35) 0%, transparent 45%),
+                radial-gradient(circle at 50% 90%, rgba(75, 105, 178, .3) 0%, transparent 50%),
+                linear-gradient(160deg, #1a0a30 0%, #3d1155 30%, #6b2a7a 55%, #8E3995 75%, #b0459c 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        .wrap {
+            max-width: 880px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            margin: 0 0 6px;
+            font-size: 28px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, .4);
+        }
+
+        header p {
+            margin: 0;
+            color: var(--sup3);
+            font-size: 14px;
+        }
+
+        /* Top-right Logo Badge (Fixed to top-right of screen) */
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 26px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .logo-badge {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 10px 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            border: 2px solid rgba(255, 255, 255, 0.95);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .logo-badge:hover {
+            transform: translateY(-3px) scale(1.08);
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .badge-logo {
+            height: 38px;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.6s ease;
+        }
+
+        .logo-badge.spinning-badge {
+            animation: badgeGlowPulse 0.6s infinite alternate ease-in-out;
+        }
+
+        .logo-badge.spinning-badge .badge-logo {
+            animation: logoSpin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes logoSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.18); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes badgeGlowPulse {
+            0% { box-shadow: 0 0 15px rgba(252, 179, 24, 0.7), 0 8px 25px rgba(0,0,0,0.2); }
+            100% { box-shadow: 0 0 30px rgba(241, 161, 198, 0.95), 0 0 40px rgba(142, 57, 149, 0.8); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        select,
+        button {
+            font-size: 15px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 2px solid var(--primary3);
+            cursor: pointer;
+            background: #fff;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        button.primary {
+            background: var(--primary3);
+            color: #fff;
+            border: none;
+            box-shadow: 0 6px 16px rgba(142, 57, 149, .4);
+        }
+
+        button.primary:hover {
+            background: #742e7a;
+        }
+
+        button.gold {
+            background: var(--primary2);
+            color: #3a2a00;
+            border: none;
+            box-shadow: 0 6px 16px rgba(252, 179, 24, .4);
+        }
+
+        button.gold:hover {
+            background: #e6a30a;
+        }
+
+        button.pink {
+            background: var(--primary1);
+            color: #5c1236;
+            border: none;
+            box-shadow: 0 6px 16px rgba(241, 161, 198, .4);
+        }
+
+        button.secondary {
+            background: #fff;
+            color: var(--primary3);
+        }
+
+        /* Spin wheel display */
+        .spin-box {
+            background: linear-gradient(135deg, var(--sup3), #fff);
+            border: 3px solid var(--primary2);
+            border-radius: 14px;
+            padding: 26px;
+            text-align: center;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            overflow: hidden;
+            position: relative;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+        }
+
+        .spin-box.spinning {
+            border-color: var(--primary3);
+            animation: boxGlowPulse 0.4s infinite alternate ease-in-out;
+        }
+
+        @keyframes boxGlowPulse {
+            0% {
+                box-shadow: 0 0 15px rgba(241, 161, 198, 0.6), inset 0 0 15px rgba(142, 57, 149, 0.3);
+                transform: scale(0.998);
+            }
+            100% {
+                box-shadow: 0 0 35px rgba(252, 179, 24, 0.9), 0 0 25px rgba(75, 105, 178, 0.6), inset 0 0 25px rgba(241, 161, 198, 0.5);
+                transform: scale(1.008);
+            }
+        }
+
+        .spin-box.landed {
+            animation: landPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes landPop {
+            0% { transform: scale(0.95); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        #spinCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .topic-cat, .topic-sub, .topic-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        .topic-cat {
+            font-size: 13px;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--sup1);
+            font-weight: 700;
+        }
+
+        .topic-sub {
+            font-size: 13px;
+            color: var(--sup2);
+            font-weight: 700;
+        }
+
+        .topic-text {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--text);
+            transition: all 0.1s ease;
+        }
+
+        .spinning .topic-text {
+            color: var(--primary3);
+            filter: blur(0.5px);
+            transform: translateY(-2px);
+            text-shadow: 0 0 10px rgba(142, 57, 149, 0.4);
+        }
+
+        /* Timer */
+        .timer-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed var(--sup3);
+        }
+
+        .timer-display {
+            font-size: 96px;
+            font-weight: 800;
+            color: var(--primary3);
+            min-width: 220px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            text-shadow: 0 4px 12px rgba(142, 57, 149, .25);
+        }
+
+        .timer-display.warning {
+            color: var(--primary2);
+        }
+
+        .timer-display.danger {
+            color: var(--sup2);
+            animation: pulse .5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timer-preset {
+            padding: 10px 18px;
+            font-size: 15px;
+            border-radius: 10px;
+            border: 2px solid var(--sup1);
+            background: #fff;
+            color: var(--sup1);
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .timer-preset.active {
+            background: var(--sup1);
+            color: #fff;
+        }
+
+        .prep-toggle,
+        .values-toggle {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .prep-box,
+        .values-box {
+            margin-top: 14px;
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: none;
+        }
+
+        .prep-box {
+            background: #fff7e6;
+            border: 1px solid var(--primary2);
+        }
+
+        .values-box {
+            background: #f9f0fb;
+            border: 1px solid var(--primary3);
+        }
+
+        .prep-box.show,
+        .values-box.show {
+            display: block;
+        }
+
+        .prep-box h3,
+        .values-box h3 {
+            margin: 0 0 10px;
+            font-size: 15px;
+        }
+
+        .prep-box h3 {
+            color: #b8790a;
+        }
+
+        .values-box h3 {
+            color: var(--primary3);
+        }
+
+        .prep-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .prep-letter {
+            background: var(--primary2);
+            color: #fff;
+            font-weight: 700;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 13px;
+        }
+
+        .value-item {
+            margin-bottom: 10px;
+            font-size: 13.5px;
+            line-height: 1.5;
+        }
+
+        .value-item b {
+            color: var(--primary3);
+        }
+
+        .list-toggle {
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .all-topics {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .all-topics.show {
+            display: block;
+        }
+
+        .cat-block {
+            margin-bottom: 18px;
+        }
+
+        .cat-block h4 {
+            margin: 0 0 8px;
+            color: var(--primary3);
+            border-bottom: 2px solid var(--primary2);
+            display: inline-block;
+            padding-bottom: 2px;
+            font-size: 15px;
+        }
+
+        .cat-block ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .cat-block li {
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--sup3);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        @media(max-width:480px) {
+            .card {
+                padding: 18px;
+            }
+
+            .topic-text {
+                font-size: 17px;
+            }
+
+            .timer-display {
+                font-size: 64px;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <header>
+            <h1>🎤 AIESEC Speech Topic Generator</h1>
+        </header>
+
+        <div class="card">
+            <!-- White rounded logo badge top-right -->
+            <div class="logo-badge" id="logoBadge" title="AIESEC Speech Topic Generator Logo">
+                <img src="logo-g.png" onerror="this.src='data:image/png;base64,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FoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFoBFv3hAZDI6Ba3Ym2O8zvyCuNm5bO1Rn/CeZt6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'">
+            </div>
+
+            <div class="controls">
+                <select id="categoryFilter">
+                    <option value="all">Semua Kategori</option>
+                    <option value="Activating Leadership">Activating Leadership</option>
+                    <option value="Living Diversity">Living Diversity</option>
+                    <option value="Striving for Excellence">Striving for Excellence</option>
+                    <option value="Enjoying Participation">Enjoying Participation</option>
+                    <option value="Demonstrating Integrity">Demonstrating Integrity</option>
+                    <option value="Acting Sustainably">Acting Sustainably</option>
+                    <option value="Individual Discovery and Reflection">GLE: Individual Discovery & Reflection</option>
+                    <option value="Team Experiences">GLE: Team Experiences</option>
+                    <option value="Learning Circles">GLE: Learning Circles</option>
+                    <option value="Conferences and Seminars">GLE: Conferences and Seminars</option>
+                    <option value="Mentoring">GLE: Mentoring</option>
+                    <option value="Virtual Spaces">GLE: Virtual Spaces</option>
+                    <option value="Global Mindset">Global Mindset</option>
+                    <option value="Embracing Failure">Embracing Failure</option>
+                    <option value="Asking for Help">Asking for Help</option>
+                    <option value="Imposter Syndrome">Imposter Syndrome</option>
+                    <option value="The Unseen Struggle">The Unseen Struggle</option>
+                    <option value="Constructive Feedback">Constructive Feedback</option>
+                    <option value="Setting Boundaries">Setting Boundaries</option>
+                    <option value="Leading Without a Title">Leading Without a Title</option>
+                    <option value="Active Listening">Active Listening</option>
+                    <option value="Leading Through Change">Leading Through Change</option>
+                    <option value="Self-Awareness">Self-Awareness</option>
+                    <option value="Inspiring Others">Inspiring Others</option>
+                    <option value="The First Step">The First Step</option>
+                </select>
+                <button class="primary" id="generateBtn">🎡 Spin Topic</button>
+                <button class="secondary" id="copyBtn">📋 Copy</button>
+            </div>
+
+            <div class="spin-box" id="spinBox">
+                <canvas id="spinCanvas"></canvas>
+                <div class="topic-cat" id="topicSection">-</div>
+                <div class="topic-sub" id="topicCat">-</div>
+                <div class="topic-text" id="topicText">Klik "Spin Topic" untuk mulai ✨</div>
+            </div>
+
+            <!-- TIMER SECTION -->
+            <div class="timer-section">
+                <div class="timer-display" id="timerDisplay">01:00</div>
+                <div class="timer-controls">
+                    <button class="timer-preset" data-secs="30">30s</button>
+                    <button class="timer-preset active" data-secs="60">60s</button>
+                    <button class="timer-preset" data-secs="90">90s</button>
+                    <button class="timer-preset" data-secs="120">120s</button>
+                    <button class="gold" id="startTimerBtn">▶️ Mulai</button>
+                    <button class="pink" id="resetTimerBtn">🔄 Reset</button>
+                </div>
+            </div>
+
+            <div class="prep-toggle">
+                <button class="secondary" id="prepBtn">💡 Tampilkan Tip: PREP Framework</button>
+                <div class="prep-box" id="prepBox">
+                    <h3>Sebelum kamu mulai bicara, ingat PREP:</h3>
+                    <div class="prep-item">
+                        <div class="prep-letter">P</div>
+                        <div><b>Point</b> — Sampaikan ide utamamu dengan jelas.</div>
+                    </div>
+                    <div class="prep-item">
+                        <div class="prep-letter">R</div>
+                        <div><b>Reason</b> — Jelaskan mengapa kamu percaya hal itu.</div>
+                    </div>
+                    <div class="prep-item">
+                        <div class="prep-letter">E</div>
+                        <div><b>Example</b> — Bagikan cerita atau contoh singkat.</div>
+                    </div>
+                    <div class="prep-item">
+                        <div class="prep-letter">P</div>
+                        <div><b>Point</b> — Tegaskan kembali pesan utamamu.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="values-toggle">
+                <button class="secondary" id="valuesBtn">🌍 Tampilkan AIESEC Values</button>
+                <div class="values-box" id="valuesBox">
+                    <h3>6 Core Values AIESEC</h3>
+                    <div class="value-item"><b>Striving for Excellence</b> — We aim to deliver the highest quality
+                        performance in everything we do. Through creativity and innovation we seek to continuously
+                        improve.</div>
+                    <div class="value-item"><b>Demonstrating Integrity</b> — We are consistent and transparent in our
+                        decisions and actions. We fulfil our commitments and conduct ourselves in a way that is true to
+                        our vision.</div>
+                    <div class="value-item"><b>Activating Leadership</b> — We lead by example and inspire leadership
+                        through action and results, taking full responsibility for developing others.</div>
+                    <div class="value-item"><b>Acting Sustainably</b> — We act in a way that is sustainable for our
+                        organisation and society. Our decisions take into account the needs of future generations.</div>
+                    <div class="value-item"><b>Enjoying Participation</b> — We create dynamic and welcoming environments
+                        which stimulate active and enthusiastic participation by our members.</div>
+                    <div class="value-item"><b>Living Diversity</b> — We seek to learn from the different ways of life
+                        and opinions represented in our multicultural environment. We respect and actively encourage the
+                        contribution of every individual.</div>
+                </div>
+            </div>
+
+            <div class="list-toggle">
+                <button class="secondary" id="listBtn">📜 Lihat Semua Topik</button>
+            </div>
+
+            <div class="all-topics" id="allTopics"></div>
+
+        </div>
+
+    </div>
+
+    <audio id="alertSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" type="audio/wav">
+    </audio>
+
+    <script>
+        const topics = [
+            // --- AIESEC Values & Core Principles ---
+            { section: "Activating Leadership", cat: "Activating Leadership", text: "What does taking the initiative look like when no one else in your team is stepping up?" },
+            { section: "Activating Leadership", cat: "Activating Leadership", text: "How do you inspire team members who have lost confidence in their abilities?" },
+            { section: "Activating Leadership", cat: "Activating Leadership", text: "Describe a moment when you had to lead by example under high pressure." },
+            { section: "Activating Leadership", cat: "Activating Leadership", text: "What is the difference between managing a project and activating leadership in people?" },
+            { section: "Activating Leadership", cat: "Activating Leadership", text: "How do you empower others to take ownership instead of micromanaging them?" },
+
+            { section: "Activating Leadership", cat: "Living Diversity", text: "Share a time when working with someone very different from you completely changed your perspective." },
+            { section: "Activating Leadership", cat: "Living Diversity", text: "How can cultural differences within a team become a strength rather than a barrier?" },
+            { section: "Activating Leadership", cat: "Living Diversity", text: "What steps do you take to make sure every voice in a meeting is heard and respected?" },
+            { section: "Activating Leadership", cat: "Living Diversity", text: "How do you handle misunderstandings caused by different communication styles?" },
+            { section: "Activating Leadership", cat: "Living Diversity", text: "Why is inclusivity essential for building a high-performing global team?" },
+
+            { section: "Activating Leadership", cat: "Striving for Excellence", text: "How do you balance high standards with empathy when a team member is struggling?" },
+            { section: "Activating Leadership", cat: "Striving for Excellence", text: "What does 'continuous improvement' mean to you in your personal and professional life?" },
+            { section: "Activating Leadership", cat: "Striving for Excellence", text: "Describe a situation where good enough was not enough, and how you pushed for excellence." },
+            { section: "Activating Leadership", cat: "Striving for Excellence", text: "How do you keep your team motivated when facing repeated setbacks?" },
+            { section: "Activating Leadership", cat: "Striving for Excellence", text: "How do you measure true success beyond just hitting numerical targets?" },
+
+            { section: "Activating Leadership", cat: "Enjoying Participation", text: "Why is celebrating small wins essential for keeping a team motivated through hard times?" },
+            { section: "Activating Leadership", cat: "Enjoying Participation", text: "How do you turn a boring or tedious task into an enjoyable experience for your team?" },
+            { section: "Activating Leadership", cat: "Enjoying Participation", text: "Describe a team event or ritual that created an unforgettable bond among members." },
+            { section: "Activating Leadership", cat: "Enjoying Participation", text: "How does enthusiasm from a leader influence the overall energy of a project?" },
+            { section: "Activating Leadership", cat: "Enjoying Participation", text: "What role does fun play in maintaining long-term productivity and preventing burnout?" },
+
+            { section: "Activating Leadership", cat: "Demonstrating Integrity", text: "What should a leader do when the right decision is also the most unpopular one?" },
+            { section: "Activating Leadership", cat: "Demonstrating Integrity", text: "Share a time when you had to stand up for your ethical principles despite peer pressure." },
+            { section: "Activating Leadership", cat: "Demonstrating Integrity", text: "How do you build trust with your team when you make a mistake?" },
+            { section: "Activating Leadership", cat: "Demonstrating Integrity", text: "Why is transparency in decision-making crucial for team morale?" },
+            { section: "Activating Leadership", cat: "Demonstrating Integrity", text: "How do you handle a situation where a promise made to your team cannot be kept?" },
+
+            { section: "Activating Leadership", cat: "Acting Sustainably", text: "How do you make sure the decisions you make today won't cost the next generation of members tomorrow?" },
+            { section: "Activating Leadership", cat: "Acting Sustainably", text: "What does sustainable leadership mean in terms of personal work-life balance?" },
+            { section: "Activating Leadership", cat: "Acting Sustainably", text: "How can young leaders drive environmental and social sustainability in their local communities?" },
+            { section: "Activating Leadership", cat: "Acting Sustainably", text: "How do you build systems in an organization that outlast your own term or tenure?" },
+            { section: "Activating Leadership", cat: "Acting Sustainably", text: "Why is long-term vision more important than short-term glory in leadership?" },
+
+            // --- Global Learning Environment ---
+            { section: "Global Learning Environment", cat: "Individual Discovery and Reflection", text: "How has self-reflection (journaling, self-assessment tools) helped you understand your own growth?" },
+            { section: "Global Learning Environment", cat: "Individual Discovery and Reflection", text: "What is one unexpected discovery you made about yourself while leading a project?" },
+            { section: "Global Learning Environment", cat: "Individual Discovery and Reflection", text: "How do you create quiet time for reflection amidst a hectic schedule?" },
+            { section: "Global Learning Environment", cat: "Individual Discovery and Reflection", text: "What personal value guides your decisions when facing moral ambiguity?" },
+            { section: "Global Learning Environment", cat: "Individual Discovery and Reflection", text: "How do you transform personal failures into valuable life lessons?" },
+
+            { section: "Global Learning Environment", cat: "Team Experiences", text: "Describe a moment where team building or team feedback changed how your team worked together." },
+            { section: "Global Learning Environment", cat: "Team Experiences", text: "What makes a team experience truly life-changing for its members?" },
+            { section: "Global Learning Environment", cat: "Team Experiences", text: "How do you navigate conflict between two strong personalities on your team?" },
+            { section: "Global Learning Environment", cat: "Team Experiences", text: "What is the secret to building deep trust in a newly formed team?" },
+            { section: "Global Learning Environment", cat: "Team Experiences", text: "How do you celebrate diversity of roles so everyone feels equally valued?" },
+
+            { section: "Global Learning Environment", cat: "Learning Circles", text: "How can hosting a space for collective discussion help a group make sense of a shared challenge?" },
+            { section: "Global Learning Environment", cat: "Learning Circles", text: "What makes a peer-to-peer learning environment more impactful than traditional lectures?" },
+            { section: "Global Learning Environment", cat: "Learning Circles", text: "How do you encourage quiet or introverted team members to share their insights?" },
+            { section: "Global Learning Environment", cat: "Learning Circles", text: "Describe a powerful insight you gained from listening to someone else's story." },
+            { section: "Global Learning Environment", cat: "Learning Circles", text: "How do you facilitate open dialogue when discussing sensitive or difficult topics?" },
+
+            { section: "Global Learning Environment", cat: "Conferences and Seminars", text: "What is the most valuable lesson you've taken from a conference, seminar, or training experience?" },
+            { section: "Global Learning Environment", cat: "Conferences and Seminars", text: "How do you translate the energy and inspiration from a conference into daily action?" },
+            { section: "Global Learning Environment", cat: "Conferences and Seminars", text: "Describe a networking moment at a seminar that opened up unexpected opportunities." },
+            { section: "Global Learning Environment", cat: "Conferences and Seminars", text: "Why is stepping outside your daily routine essential for personal breakthroughs?" },
+            { section: "Global Learning Environment", cat: "Conferences and Seminars", text: "How do you share what you've learned at a conference with team members who couldn't attend?" },
+
+            { section: "Global Learning Environment", cat: "Mentoring", text: "How has coaching, mentoring, or shadowing someone shaped the leader you are today?" },
+            { section: "Global Learning Environment", cat: "Mentoring", text: "What qualities make a great mentor, and how do you apply them when guiding others?" },
+            { section: "Global Learning Environment", cat: "Mentoring", text: "Share a moment when a mentee taught you something profound." },
+            { section: "Global Learning Environment", cat: "Mentoring", text: "How do you give constructive guidance without imposing your own way of doing things?" },
+            { section: "Global Learning Environment", cat: "Mentoring", text: "Why is mentorship a two-way street for both the mentor and the mentee?" },
+
+            { section: "Global Learning Environment", cat: "Virtual Spaces", text: "How can digital spaces like webinars, blogs, or resource hubs be used to keep a community learning together?" },
+            { section: "Global Learning Environment", cat: "Virtual Spaces", text: "What are the biggest challenges of leading a remote team and how do you overcome them?" },
+            { section: "Global Learning Environment", cat: "Virtual Spaces", text: "How do you build human connection and warmth in virtual meetings?" },
+            { section: "Global Learning Environment", cat: "Virtual Spaces", text: "What digital tools or habits help you stay focused in an era of constant notifications?" },
+            { section: "Global Learning Environment", cat: "Virtual Spaces", text: "How can virtual collaboration bridge geographical and cultural gaps effectively?" },
+
+            // --- Vulnerability & Authentic Leadership ---
+            { section: "Vulnerability & Authentic Leadership", cat: "Global Mindset", text: "How has being part of a global movement like AIESEC shifted the way you view your local community?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Global Mindset", text: "What does it mean to be a global citizen in today's interconnected world?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Global Mindset", text: "How do you adapt your leadership approach when working across different timezones and cultures?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Global Mindset", text: "Why is curiosity about other cultures a superpower for modern leaders?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Global Mindset", text: "How can local youth address global issues like climate change or inequality?" },
+
+            { section: "Vulnerability & Authentic Leadership", cat: "Embracing Failure", text: "Describe a mistake you made as a leader and what it taught you about resilience." },
+            { section: "Vulnerability & Authentic Leadership", cat: "Embracing Failure", text: "How do you foster a team culture where people feel safe to experiment and fail?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Embracing Failure", text: "What is the difference between a foolish mistake and a valuable learning experience?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Embracing Failure", text: "How do you bounce back emotionally after a project you worked hard on fails?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Embracing Failure", text: "Why is fear of failure often a bigger obstacle than failure itself?" },
+
+            { section: "Vulnerability & Authentic Leadership", cat: "Asking for Help", text: "Why is admitting \"I don't know the answer\" a sign of strength rather than weakness?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Asking for Help", text: "Describe a time when asking for help saved a project from disaster." },
+            { section: "Vulnerability & Authentic Leadership", cat: "Asking for Help", text: "What holds people back from seeking help, and how can leaders normalize it?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Asking for Help", text: "How do you build a support network of mentors and peers you can turn to?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Asking for Help", text: "Why is delegation a form of asking for help and trusting your team?" },
+
+            { section: "Vulnerability & Authentic Leadership", cat: "Imposter Syndrome", text: "Have you ever felt unqualified for a role? How did you push past that feeling?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Imposter Syndrome", text: "How do you help a team member who is struggling with self-doubt?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Imposter Syndrome", text: "What self-talk strategies help you build genuine confidence before a big presentation?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Imposter Syndrome", text: "Why do high achievers often suffer from imposter syndrome?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Imposter Syndrome", text: "How do you celebrate your own achievements without feeling arrogant?" },
+
+            { section: "Vulnerability & Authentic Leadership", cat: "The Unseen Struggle", text: "What is one hidden challenge of leadership that people rarely talk about?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "The Unseen Struggle", text: "How do you deal with the loneliness that sometimes comes with being in charge?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "The Unseen Struggle", text: "How do you maintain emotional balance when facing pressure from both above and below?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "The Unseen Struggle", text: "Share a time when you had to put on a brave face for your team despite personal doubts." },
+            { section: "Vulnerability & Authentic Leadership", cat: "The Unseen Struggle", text: "Why is vulnerability essential for authentic connection with your followers?" },
+
+            { section: "Vulnerability & Authentic Leadership", cat: "Constructive Feedback", text: "How do you handle receiving harsh feedback without taking it personally?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Constructive Feedback", text: "What is your formula for delivering feedback that motivates rather than discourages?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Constructive Feedback", text: "Describe a piece of feedback you received that transformed your leadership style." },
+            { section: "Vulnerability & Authentic Leadership", cat: "Constructive Feedback", text: "How do you create a culture of continuous 360-degree feedback in your team?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Constructive Feedback", text: "Why is timely feedback more effective than annual or quarterly reviews?" },
+
+            { section: "Vulnerability & Authentic Leadership", cat: "Setting Boundaries", text: "Why is learning to say \"no\" crucial for preventing burnout in youth leaders?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Setting Boundaries", text: "How do you set healthy boundaries between your work, studies, and personal life?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Setting Boundaries", text: "What do you do when stakeholders demand more than your team can realistically deliver?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Setting Boundaries", text: "How do you model work-life balance for your team members?" },
+            { section: "Vulnerability & Authentic Leadership", cat: "Setting Boundaries", text: "Why is protecting your personal energy necessary for long-term impact?" },
+
+            // --- Everyday Impact & Mindset ---
+            { section: "Everyday Impact & Mindset", cat: "Leading Without a Title", text: "How can someone make a major impact in a project without being the designated team leader?" },
+            { section: "Everyday Impact & Mindset", cat: "Leading Without a Title", text: "Share an instance where informal leadership solved a problem official channels couldn't." },
+            { section: "Everyday Impact & Mindset", cat: "Leading Without a Title", text: "How do you build influence and credibility when you don't have authority?" },
+            { section: "Everyday Impact & Mindset", cat: "Leading Without a Title", text: "Why is initiative the true foundation of leadership, regardless of title?" },
+            { section: "Everyday Impact & Mindset", cat: "Leading Without a Title", text: "How can you support your team leader from behind the scenes?" },
+
+            { section: "Everyday Impact & Mindset", cat: "Active Listening", text: "Why is listening often more powerful than speaking when guiding a team?" },
+            { section: "Everyday Impact & Mindset", cat: "Active Listening", text: "How do you practice active listening when you strongly disagree with what is being said?" },
+            { section: "Everyday Impact & Mindset", cat: "Active Listening", text: "What subtle non-verbal cues help you understand how your team is really feeling?" },
+            { section: "Everyday Impact & Mindset", cat: "Active Listening", text: "Describe a time when listening closely revealed the root cause of a complex problem." },
+            { section: "Everyday Impact & Mindset", cat: "Active Listening", text: "How can active listening turn a hostile confrontation into a constructive dialogue?" },
+
+            { section: "Everyday Impact & Mindset", cat: "Leading Through Change", text: "How do you stay calm and adapt when a project plan completely falls apart?" },
+            { section: "Everyday Impact & Mindset", cat: "Leading Through Change", text: "How do you guide a team through uncertainty when you don't have all the answers yourself?" },
+            { section: "Everyday Impact & Mindset", cat: "Leading Through Change", text: "What strategies help people overcome resistance to new ways of working?" },
+            { section: "Everyday Impact & Mindset", cat: "Leading Through Change", text: "Describe a major pivot your team had to make and how you executed it successfully." },
+            { section: "Everyday Impact & Mindset", cat: "Leading Through Change", text: "Why is agility more valuable than rigid planning in fast-changing environments?" },
+
+            { section: "Everyday Impact & Mindset", cat: "Self-Awareness", text: "What is one personal weakness you are actively trying to turn into a leadership strength?" },
+            { section: "Everyday Impact & Mindset", cat: "Self-Awareness", text: "How do you identify your personal triggers and manage your emotional reactions under stress?" },
+            { section: "Everyday Impact & Mindset", cat: "Self-Awareness", text: "What tools or habits help you gain objective insight into your own behavior?" },
+            { section: "Everyday Impact & Mindset", cat: "Self-Awareness", text: "How does understanding your personality type help you collaborate better with others?" },
+            { section: "Everyday Impact & Mindset", cat: "Self-Awareness", text: "Why is self-awareness the first step toward self-mastery?" },
+
+            { section: "Everyday Impact & Mindset", cat: "Inspiring Others", text: "How do you rekindle passion in your team when enthusiasm is running low?" },
+            { section: "Everyday Impact & Mindset", cat: "Inspiring Others", text: "What role does storytelling play in communicating a compelling vision?" },
+            { section: "Everyday Impact & Mindset", cat: "Inspiring Others", text: "How do you connect everyday tasks to the bigger purpose of your organization?" },
+            { section: "Everyday Impact & Mindset", cat: "Inspiring Others", text: "Describe a leader who deeply inspired you and what specific qualities made them stand out." },
+            { section: "Everyday Impact & Mindset", cat: "Inspiring Others", text: "How do you inspire people who have completely different motivations than your own?" },
+
+            { section: "Everyday Impact & Mindset", cat: "The First Step", text: "What is one brave action every young leader should take at least once?" },
+            { section: "Everyday Impact & Mindset", cat: "The First Step", text: "How do you overcome the paralysis of overthinking and just start?" },
+            { section: "Everyday Impact & Mindset", cat: "The First Step", text: "Share a time when taking a leap of faith led to unexpected personal growth." },
+            { section: "Everyday Impact & Mindset", cat: "The First Step", text: "Why is momentum more important than perfection when launching a new initiative?" },
+            { section: "Everyday Impact & Mindset", cat: "The First Step", text: "What advice would you give to someone who wants to lead but is afraid to take the first step?" }
+        ];
+
+        const topicSectionEl = document.getElementById('topicSection');
+        const topicCatEl = document.getElementById('topicCat');
+        const topicTextEl = document.getElementById('topicText');
+        const spinBox = document.getElementById('spinBox');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const generateBtn = document.getElementById('generateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const prepBtn = document.getElementById('prepBtn');
+        const prepBox = document.getElementById('prepBox');
+        const logoBadge = document.getElementById('logoBadge');
+        const valuesBtn = document.getElementById('valuesBtn');
+        const valuesBox = document.getElementById('valuesBox');
+        const listBtn = document.getElementById('listBtn');
+        const allTopicsEl = document.getElementById('allTopics');
+        const spinCanvas = document.getElementById('spinCanvas');
+        const ctxCanvas = spinCanvas ? spinCanvas.getContext('2d') : null;
+
+        let currentTopic = null;
+        let isSpinning = false;
+        let particles = [];
+        let animFrameId = null;
+
+        // Sound generator via WebAudio API
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playTickSound() {
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(450 + Math.random() * 200, ctx.currentTime);
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.04);
+            } catch(e){}
+        }
+
+        function playLandSound() {
+            try {
+                const ctx = getAudioContext();
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.08 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + idx * 0.08);
+                    osc.stop(ctx.currentTime + idx * 0.08 + 0.3);
+                });
+            } catch(e){}
+        }
+
+        // Particle Visualizer Engine
+        function resizeCanvas() {
+            if (!spinCanvas) return;
+            spinCanvas.width = spinBox.clientWidth;
+            spinCanvas.height = spinBox.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createBurstParticles(count = 35) {
+            if (!spinCanvas) return;
+            const w = spinCanvas.width;
+            const h = spinCanvas.height;
+            const colors = ['#F1A1C6', '#FCB318', '#8E3995', '#4B69B2', '#ffffff'];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: w / 2,
+                    y: h / 2,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.5) * 12,
+                    radius: Math.random() * 5 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1,
+                    decay: Math.random() * 0.03 + 0.015
+                });
+            }
+        }
+
+        function renderCanvasVisualizer() {
+            if (!ctxCanvas || !spinCanvas) return;
+            ctxCanvas.clearRect(0, 0, spinCanvas.width, spinCanvas.height);
+
+            const w = spinCanvas.width;
+            const h = spinCanvas.height;
+
+            if (isSpinning) {
+                // Soundwave equalizer bars effect
+                const barCount = 18;
+                const barWidth = w / barCount;
+                ctxCanvas.fillStyle = 'rgba(142, 57, 149, 0.15)';
+                for (let i = 0; i < barCount; i++) {
+                    const barHeight = Math.sin(Date.now() * 0.01 + i) * (h * 0.35) + (h * 0.2);
+                    const colorIndex = i % 4;
+                    const fillColors = ['rgba(241, 161, 198, 0.25)', 'rgba(252, 179, 24, 0.25)', 'rgba(142, 57, 149, 0.25)', 'rgba(75, 105, 178, 0.25)'];
+                    ctxCanvas.fillStyle = fillColors[colorIndex];
+                    ctxCanvas.fillRect(i * barWidth, h - barHeight, barWidth - 2, barHeight);
+                }
+
+                // Random ambient particles while spinning
+                if (Math.random() < 0.4) {
+                    particles.push({
+                        x: Math.random() * w,
+                        y: h + 5,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: -Math.random() * 3 - 1,
+                        radius: Math.random() * 4 + 1.5,
+                        color: ['#F1A1C6', '#FCB318', '#8E3995', '#4B69B2'][Math.floor(Math.random() * 4)],
+                        alpha: 0.9,
+                        decay: 0.02
+                    });
+                }
+            }
+
+            // Draw and update particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= p.decay;
+
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                ctxCanvas.save();
+                ctxCanvas.globalAlpha = Math.max(0, p.alpha);
+                ctxCanvas.fillStyle = p.color;
+                ctxCanvas.beginPath();
+                ctxCanvas.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctxCanvas.fill();
+                ctxCanvas.restore();
+            }
+
+            if (isSpinning || particles.length > 0) {
+                animFrameId = requestAnimationFrame(renderCanvasVisualizer);
+            }
+        }
+
+        function pickFromPool() {
+            const filter = categoryFilter.value;
+            const pool = filter === 'all' ? topics : topics.filter(t => t.cat === filter);
+            return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+        }
+
+        function generateTopic() {
+            if (isSpinning) return;
+            const filter = categoryFilter.value;
+            const pool = filter === 'all' ? topics : topics.filter(t => t.cat === filter);
+            if (pool.length === 0) return;
+
+            resizeCanvas();
+            isSpinning = true;
+            spinBox.classList.remove('landed');
+            spinBox.classList.add('spinning');
+            if (logoBadge) logoBadge.classList.add('spinning-badge');
+            generateBtn.disabled = true;
+
+            cancelAnimationFrame(animFrameId);
+            animFrameId = requestAnimationFrame(renderCanvasVisualizer);
+
+            let ticks = 0;
+            const totalTicks = 22;
+            let delay = 50;
+
+            function tick() {
+                const flash = pool[Math.floor(Math.random() * pool.length)];
+                topicSectionEl.textContent = flash.section;
+                topicCatEl.textContent = flash.cat;
+                topicTextEl.textContent = flash.text;
+                ticks++;
+
+                playTickSound();
+
+                if (ticks < totalTicks) {
+                    delay += Math.floor(ticks * 3.8); // slow down gradually
+                    setTimeout(tick, delay);
+                } else {
+                    const finalPick = pool[Math.floor(Math.random() * pool.length)];
+                    currentTopic = finalPick;
+                    topicSectionEl.textContent = finalPick.section;
+                    topicCatEl.textContent = finalPick.cat;
+                    topicTextEl.textContent = finalPick.text;
+                    spinBox.classList.remove('spinning');
+                    spinBox.classList.add('landed');
+                    if (logoBadge) logoBadge.classList.remove('spinning-badge');
+                    generateBtn.disabled = false;
+                    isSpinning = false;
+
+                    playLandSound();
+                    createBurstParticles(45);
+                    renderCanvasVisualizer();
+                }
+            }
+            tick();
+        }
+
+        generateBtn.addEventListener('click', generateTopic);
+
+        copyBtn.addEventListener('click', () => {
+            if (!currentTopic) { return; }
+            const str = `[${currentTopic.cat}] ${currentTopic.text}`;
+            navigator.clipboard.writeText(str).then(() => {
+                copyBtn.textContent = '✅ Copied!';
+                setTimeout(() => copyBtn.textContent = '📋 Copy', 1500);
+            });
+        });
+
+        prepBtn.addEventListener('click', () => {
+            prepBox.classList.toggle('show');
+            prepBtn.textContent = prepBox.classList.contains('show') ? '💡 Sembunyikan Tip PREP' : '💡 Tampilkan Tip: PREP Framework';
+        });
+
+        valuesBtn.addEventListener('click', () => {
+            valuesBox.classList.toggle('show');
+            valuesBtn.textContent = valuesBox.classList.contains('show') ? '🌍 Sembunyikan AIESEC Values' : '🌍 Tampilkan AIESEC Values';
+        });
+
+        listBtn.addEventListener('click', () => {
+            allTopicsEl.classList.toggle('show');
+            if (allTopicsEl.classList.contains('show') && allTopicsEl.innerHTML === '') {
+                const sections = [...new Set(topics.map(t => t.section))];
+                sections.forEach(sec => {
+                    const items = topics.filter(t => t.section === sec);
+                    const block = document.createElement('div');
+                    block.className = 'cat-block';
+                    block.innerHTML = `<h4>${sec}</h4><ul>${items.map(i => `<li><b>${i.cat}:</b> ${i.text}</li>`).join('')}</ul>`;
+                    allTopicsEl.appendChild(block);
+                });
+            }
+            listBtn.textContent = allTopicsEl.classList.contains('show') ? '📜 Sembunyikan Daftar' : '📜 Lihat Semua Topik';
+        });
+
+        /* ================= TIMER ================= */
+        const timerDisplay = document.getElementById('timerDisplay');
+        const startTimerBtn = document.getElementById('startTimerBtn');
+        const resetTimerBtn = document.getElementById('resetTimerBtn');
+        const presetBtns = document.querySelectorAll('.timer-preset');
+        const alertSound = document.getElementById('alertSound');
+
+        let totalSeconds = 60;
+        let remainingSeconds = 60;
+        let timerInterval = null;
+        let isRunning = false;
+
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const sec = s % 60;
+            return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            timerDisplay.textContent = formatTime(remainingSeconds);
+            timerDisplay.classList.remove('warning', 'danger');
+            if (remainingSeconds <= 10) {
+                timerDisplay.classList.add('danger');
+            } else if (remainingSeconds <= totalSeconds * 0.3) {
+                timerDisplay.classList.add('warning');
+            }
+        }
+
+        function playAlert() {
+            // Beep pakai WebAudio, lebih reliable daripada file audio kosong
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                let time = ctx.currentTime;
+                for (let i = 0; i < 3; i++) {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = 880;
+                    gain.gain.setValueAtTime(0.3, time);
+                    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.25);
+                    osc.start(time);
+                    osc.stop(time + 0.25);
+                    time += 0.35;
+                }
+            } catch (e) { /* ignore if audio blocked */ }
+        }
+
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isRunning) return;
+                presetBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                totalSeconds = parseInt(btn.dataset.secs, 10);
+                remainingSeconds = totalSeconds;
+                updateTimerDisplay();
+            });
+        });
+
+        startTimerBtn.addEventListener('click', () => {
+            if (isRunning) {
+                // pause
+                clearInterval(timerInterval);
+                isRunning = false;
+                startTimerBtn.textContent = '▶️ Lanjut';
+                return;
+            }
+            isRunning = true;
+            startTimerBtn.textContent = '⏸️ Pause';
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay();
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    startTimerBtn.textContent = '▶️ Mulai';
+                    playAlert();
+                    timerDisplay.textContent = "WAKTU HABIS!";
+                }
+            }, 1000);
+        });
+
+        resetTimerBtn.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            isRunning = false;
+            remainingSeconds = totalSeconds;
+            startTimerBtn.textContent = '▶️ Mulai';
+            updateTimerDisplay();
+        });
+
+        updateTimerDisplay();
+        generateTopic();
+    </script>
+</body>
+
+</html>
