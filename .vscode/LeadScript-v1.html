@@ -831,7 +831,7 @@
             return gemesQuotes[Math.floor(Math.random() * gemesQuotes.length)];
         }
 
-        /* ================= TIMER ================= */
+                /* ================= TIMER ================= */
         const timerDisplay = document.getElementById('timerDisplay');
         const startTimerBtn = document.getElementById('startTimerBtn');
         const resetTimerBtn = document.getElementById('resetTimerBtn');
@@ -850,6 +850,7 @@
         }
 
         function updateTimerDisplay() {
+            if (!timerDisplay) return;
             timerDisplay.textContent = formatTime(remainingSeconds);
             timerDisplay.classList.remove('warning', 'danger');
             if (remainingSeconds <= 10 && remainingSeconds > 0) {
@@ -871,72 +872,41 @@
             });
         });
 
-        startTimerBtn.addEventListener('click', () => {
-            if (isRunning) {
-                // pause
-                clearInterval(timerInterval);
-                isRunning = false;
-                startTimerBtn.textContent = '▶️ Lanjut';
-                return;
-            }
-            isRunning = true;
-            startTimerBtn.textContent = '⏸️ Pause';
-            timerInterval = setInterval(() => {
-                remainingSeconds--;
-                updateTimerDisplay();
-                if (remainingSeconds <= 0) {
+        if (startTimerBtn) {
+            startTimerBtn.addEventListener('click', () => {
+                if (isRunning) {
+                    // pause
                     clearInterval(timerInterval);
                     isRunning = false;
                     startTimerBtn.textContent = '▶️ Mulai';
-                    playAlert(); // Play Ringtone sound!
-                    timerDisplay.textContent = "🔔 TIME'S UP!";
-                    if (gemesTextEl) gemesTextEl.textContent = "Time's up! High five your pal now! 🖐️💖";
+                    return;
                 }
-            }, 1000);
-        });
-
-        resetTimerBtn.addEventListener('click', () => {
-            clearInterval(timerInterval);
-            isRunning = false;
-            remainingSeconds = totalSeconds;
-            startTimerBtn.textContent = '▶️ Mulai';
-            updateTimerDisplay();
-        });
-
-        updateTimerDisplay();
+                isRunning = true;
+                startTimerBtn.textContent = '⏸️ Pause';
+                timerInterval = setInterval(() => {
+                    remainingSeconds--;
+                    updateTimerDisplay();
+                    if (remainingSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        startTimerBtn.textContent = '▶️ Mulai';
+                        playAlert(); // Play Ringtone sound!
+                        if (timerDisplay) timerDisplay.textContent = "🔔 TIME'S UP!";
+                        if (gemesTextEl) gemesTextEl.textContent = "Time's up! High five your pal now! 🖐️💖";
+                    }
+                }, 1000);
             });
-        });
+        }
 
-        startTimerBtn.addEventListener('click', () => {
-            if (isRunning) {
-                // pause
+        if (resetTimerBtn) {
+            resetTimerBtn.addEventListener('click', () => {
                 clearInterval(timerInterval);
                 isRunning = false;
-                startTimerBtn.textContent = '▶️ Lanjut';
-                return;
-            }
-            isRunning = true;
-            startTimerBtn.textContent = '⏸️ Pause';
-            timerInterval = setInterval(() => {
-                remainingSeconds--;
+                remainingSeconds = totalSeconds;
+                if (startTimerBtn) startTimerBtn.textContent = '▶️ Mulai';
                 updateTimerDisplay();
-                if (remainingSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    isRunning = false;
-                    startTimerBtn.textContent = '▶️ Mulai';
-                    playAlert();
-                    timerDisplay.textContent = "WAKTU HABIS!";
-                }
-            }, 1000);
-        });
-
-        resetTimerBtn.addEventListener('click', () => {
-            clearInterval(timerInterval);
-            isRunning = false;
-            remainingSeconds = totalSeconds;
-            startTimerBtn.textContent = '▶️ Mulai';
-            updateTimerDisplay();
-        });
+            });
+        }
 
         updateTimerDisplay();
         generateTopic();
