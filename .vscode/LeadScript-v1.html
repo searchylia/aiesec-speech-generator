@@ -340,6 +340,42 @@
 
         
 
+        
+        /* Gemes & Funny Delegate Callout Banner */
+        .gemes-banner {
+            background: linear-gradient(135deg, #fff0f6, #fff7e6);
+            border: 2px dashed var(--primary1);
+            border-radius: 14px;
+            padding: 14px 20px;
+            margin-top: 18px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            color: #6b1d4d;
+            box-shadow: 0 4px 15px rgba(241, 161, 198, 0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .gemes-banner:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(241, 161, 198, 0.45);
+        }
+
+        .gemes-icon {
+            font-size: 22px;
+            animation: wiggle 2s infinite ease-in-out;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
         .list-toggle {
             text-align: center;
             margin-top: 18px;
@@ -439,6 +475,26 @@
                 <div class="topic-cat" id="topicSection">-</div>
                 <div class="topic-sub" id="topicCat">-</div>
                 <div class="topic-text" id="topicText">Klik "Spin Topic" untuk mulai ✨</div>
+            </div>
+
+            
+            <!-- TIMER SECTION (Default 90s / 1m 30s) -->
+            <div class="timer-section">
+                <div class="timer-display" id="timerDisplay">01:30</div>
+                <div class="timer-controls">
+                    <button class="timer-preset" data-secs="30">30s</button>
+                    <button class="timer-preset" data-secs="60">60s</button>
+                    <button class="timer-preset active" data-secs="90">1m 30s ⏱️</button>
+                    <button class="timer-preset" data-secs="120">120s</button>
+                    <button class="gold" id="startTimerBtn">▶️ Mulai</button>
+                    <button class="pink" id="resetTimerBtn">🔄 Reset</button>
+                </div>
+            </div>
+
+            <!-- GEMES & FUNNY DELEGATE CALLOUT BANNER -->
+            <div class="gemes-banner" id="gemesBanner">
+                <span class="gemes-icon">👯‍♀️</span>
+                <span class="gemes-text" id="gemesText">Find your Pals to tell freaky things! ✨</span>
             </div>
 
             <div class="list-toggle">
@@ -724,6 +780,7 @@
 
                     playLandSound();
                     createBurstParticles(45);
+                    if (gemesTextEl) gemesTextEl.textContent = getRandomGemesQuote();
                     renderCanvasVisualizer();
                 }
             }
@@ -756,15 +813,33 @@
             listBtn.textContent = allTopicsEl.classList.contains('show') ? '📜 Sembunyikan Daftar' : '📜 Lihat Semua Topik';
         });
 
+        
+        const gemesQuotes = [
+            "Find your Pals to tell freaky things! 👯‍♀️✨",
+            "Spill the tea before the 90 seconds run out! ⏰🔥",
+            "Make your delegates go 'GEMESS!' with this answer! 🥰🦄",
+            "No judging zone: 100% wholesome freaky chaos! 💖",
+            "If your team agrees with your answer, give them a high five! 🖐️💥",
+            "Speak with 100% confidence & 200% gemess energy! 🎤✨",
+            "Warning: Extreme cuteness and silly confessions ahead! 🙈💖",
+            "Tag your conference buddy to answer this with you! 🤝🔥",
+            "Give us your most dramatic & funny story! 🎭✨",
+            "Channel your inner superstar & make everyone smile! 🌟🥰"
+        ];
+
+        function getRandomGemesQuote() {
+            return gemesQuotes[Math.floor(Math.random() * gemesQuotes.length)];
+        }
+
         /* ================= TIMER ================= */
         const timerDisplay = document.getElementById('timerDisplay');
         const startTimerBtn = document.getElementById('startTimerBtn');
         const resetTimerBtn = document.getElementById('resetTimerBtn');
         const presetBtns = document.querySelectorAll('.timer-preset');
-        const alertSound = document.getElementById('alertSound');
+        const gemesTextEl = document.getElementById('gemesText');
 
-        let totalSeconds = 60;
-        let remainingSeconds = 60;
+        let totalSeconds = 90;
+        let remainingSeconds = 90;
         let timerInterval = null;
         let isRunning = false;
 
@@ -777,8 +852,9 @@
         function updateTimerDisplay() {
             timerDisplay.textContent = formatTime(remainingSeconds);
             timerDisplay.classList.remove('warning', 'danger');
-            if (remainingSeconds <= 10) {
+            if (remainingSeconds <= 10 && remainingSeconds > 0) {
                 timerDisplay.classList.add('danger');
+                playTickSound();
             } else if (remainingSeconds <= totalSeconds * 0.3) {
                 timerDisplay.classList.add('warning');
             }
@@ -792,6 +868,42 @@
                 totalSeconds = parseInt(btn.dataset.secs, 10);
                 remainingSeconds = totalSeconds;
                 updateTimerDisplay();
+            });
+        });
+
+        startTimerBtn.addEventListener('click', () => {
+            if (isRunning) {
+                // pause
+                clearInterval(timerInterval);
+                isRunning = false;
+                startTimerBtn.textContent = '▶️ Lanjut';
+                return;
+            }
+            isRunning = true;
+            startTimerBtn.textContent = '⏸️ Pause';
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay();
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    startTimerBtn.textContent = '▶️ Mulai';
+                    playAlert(); // Play Ringtone sound!
+                    timerDisplay.textContent = "🔔 TIME'S UP!";
+                    if (gemesTextEl) gemesTextEl.textContent = "Time's up! High five your pal now! 🖐️💖";
+                }
+            }, 1000);
+        });
+
+        resetTimerBtn.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            isRunning = false;
+            remainingSeconds = totalSeconds;
+            startTimerBtn.textContent = '▶️ Mulai';
+            updateTimerDisplay();
+        });
+
+        updateTimerDisplay();
             });
         });
 
