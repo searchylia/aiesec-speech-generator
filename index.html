@@ -513,64 +513,6 @@
                 <div class="topic-text" id="topicText">Klik "Spin Topic" untuk mulai ✨</div>
             </div>
 
-            <!-- TIMER SECTION -->
-            <div class="timer-section">
-                <div class="timer-display" id="timerDisplay">01:00</div>
-                <div class="timer-controls">
-                    <button class="timer-preset" data-secs="30">30s</button>
-                    <button class="timer-preset active" data-secs="60">60s</button>
-                    <button class="timer-preset" data-secs="90">90s</button>
-                    <button class="timer-preset" data-secs="120">120s</button>
-                    <button class="gold" id="startTimerBtn">▶️ Mulai</button>
-                    <button class="pink" id="resetTimerBtn">🔄 Reset</button>
-                </div>
-            </div>
-
-            <div class="prep-toggle">
-                <button class="secondary" id="prepBtn">💡 Tampilkan Tip: PREP Framework</button>
-                <div class="prep-box" id="prepBox">
-                    <h3>Sebelum kamu mulai bicara, ingat PREP:</h3>
-                    <div class="prep-item">
-                        <div class="prep-letter">P</div>
-                        <div><b>Point</b> — Sampaikan ide utamamu dengan jelas.</div>
-                    </div>
-                    <div class="prep-item">
-                        <div class="prep-letter">R</div>
-                        <div><b>Reason</b> — Jelaskan mengapa kamu percaya hal itu.</div>
-                    </div>
-                    <div class="prep-item">
-                        <div class="prep-letter">E</div>
-                        <div><b>Example</b> — Bagikan cerita atau contoh singkat.</div>
-                    </div>
-                    <div class="prep-item">
-                        <div class="prep-letter">P</div>
-                        <div><b>Point</b> — Tegaskan kembali pesan utamamu.</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="values-toggle">
-                <button class="secondary" id="valuesBtn">🌍 Tampilkan AIESEC Values</button>
-                <div class="values-box" id="valuesBox">
-                    <h3>6 Core Values AIESEC</h3>
-                    <div class="value-item"><b>Striving for Excellence</b> — We aim to deliver the highest quality
-                        performance in everything we do. Through creativity and innovation we seek to continuously
-                        improve.</div>
-                    <div class="value-item"><b>Demonstrating Integrity</b> — We are consistent and transparent in our
-                        decisions and actions. We fulfil our commitments and conduct ourselves in a way that is true to
-                        our vision.</div>
-                    <div class="value-item"><b>Activating Leadership</b> — We lead by example and inspire leadership
-                        through action and results, taking full responsibility for developing others.</div>
-                    <div class="value-item"><b>Acting Sustainably</b> — We act in a way that is sustainable for our
-                        organisation and society. Our decisions take into account the needs of future generations.</div>
-                    <div class="value-item"><b>Enjoying Participation</b> — We create dynamic and welcoming environments
-                        which stimulate active and enthusiastic participation by our members.</div>
-                    <div class="value-item"><b>Living Diversity</b> — We seek to learn from the different ways of life
-                        and opinions represented in our multicultural environment. We respect and actively encourage the
-                        contribution of every individual.</div>
-                </div>
-            </div>
-
             <div class="list-toggle">
                 <button class="secondary" id="listBtn">📜 Lihat Semua Topik</button>
             </div>
@@ -664,11 +606,7 @@
         const categoryFilter = document.getElementById('categoryFilter');
         const generateBtn = document.getElementById('generateBtn');
         const copyBtn = document.getElementById('copyBtn');
-        const prepBtn = document.getElementById('prepBtn');
-        const prepBox = document.getElementById('prepBox');
         const logoBadge = document.getElementById('logoBadge');
-        const valuesBtn = document.getElementById('valuesBtn');
-        const valuesBox = document.getElementById('valuesBox');
         const listBtn = document.getElementById('listBtn');
         const allTopicsEl = document.getElementById('allTopics');
         const spinCanvas = document.getElementById('spinCanvas');
@@ -873,16 +811,6 @@
                 copyBtn.textContent = '✅ Copied!';
                 setTimeout(() => copyBtn.textContent = '📋 Copy', 1500);
             });
-        });
-
-        prepBtn.addEventListener('click', () => {
-            prepBox.classList.toggle('show');
-            prepBtn.textContent = prepBox.classList.contains('show') ? '💡 Sembunyikan Tip PREP' : '💡 Tampilkan Tip: PREP Framework';
-        });
-
-        valuesBtn.addEventListener('click', () => {
-            valuesBox.classList.toggle('show');
-            valuesBtn.textContent = valuesBox.classList.contains('show') ? '🌍 Sembunyikan AIESEC Values' : '🌍 Tampilkan AIESEC Values';
         });
 
         listBtn.addEventListener('click', () => {
